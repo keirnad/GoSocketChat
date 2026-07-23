@@ -19,6 +19,7 @@ var upgrader = websocket.Upgrader {
 
 type Client struct {
 	conn *websocket.Conn
+	nickname string
 	send chan []byte
 }
 
@@ -56,7 +57,14 @@ func (cr *ChatRoom) HandleWebSocket(c *gin.Context) {
         return
     }
 
-    client := &Client{conn: conn, send: make(chan []byte, 256)}
+
+	nickname := c.Query("nickname")
+
+	if c.Query("nickname") == "" {
+		nickname = "Annonymus"
+	}
+
+    client := &Client{conn: conn, send: make(chan []byte, 256), nickname: nickname}
     cr.register <- client
 
     go client.Write()
