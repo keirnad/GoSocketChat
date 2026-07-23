@@ -25,14 +25,13 @@ func (cr *ChatRoom) Run() {
 		select {
 		case client := <- cr.register:
 			cr.clients.Store(client.nickname, client)
-			cr.broadcast <- []byte("System: Hello" + client.nickname + "🎉")
 		case client := <- cr.unregister:
 			cr.clients.Delete(client)
 		case message := <-cr.broadcast:
 			cr.clients.Range(func(key, value interface{}) bool {
 				client := value.(*Client)
 				select {
-				case client.send <- message:
+				case client.send <- []byte(client.nickname + ": " + string(message)):
 				default: 
 					close(client.send)
 					cr.clients.Delete(key)
