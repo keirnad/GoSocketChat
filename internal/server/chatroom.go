@@ -24,8 +24,8 @@ func (cr *ChatRoom) Run() {
 	for {
 		select {
 		case client := <- cr.register:
-			cr.broadcast <- []byte("Hello! 🎉")
-			cr.clients.Store(true, client)
+			cr.clients.Store(client.nickname, client)
+			cr.broadcast <- []byte("System: Hello" + client.nickname + "🎉")
 		case client := <- cr.unregister:
 			cr.clients.Delete(client)
 		case message := <-cr.broadcast:
