@@ -1,12 +1,18 @@
 package server
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
+
+type Message struct {
+	Nickname string `json:"nickname"`
+	Body string `json:"body"`
+}
 
 var upgrader = websocket.Upgrader {
 	ReadBufferSize: 1024,
@@ -29,21 +35,26 @@ func (c *Client) Read(cr *ChatRoom) {
 		c.conn.Close()
 	}()
 
-	for {
-		_, message, err := c.conn.ReadMessage()
-		if err != nil {
-			log.Println("Read error:", err)
-			return
-		}
+	var msg Message
 
-		cr.broadcast <- []byte(string(message))
+	for {
+		err := c.conn.ReadJSON(&msg)
+		if err != nil {
+			log.Println("Error: ", err)
+		}
+		payload := Message{Nickname: msg.Nickname, Body: msg.Body}
+		jsonmsg, err := json.Marshal(payload)
+		if err != nil {
+			log.Print("Eror")
+		}
+		cr.broadcast <- []byte(jsonmsg)
 	}
 }
 
 func (c *Client) Write() {
 	defer c.conn.Close()
 	for message := range c.send {
-		if err := c.conn.WriteMessage(websocket.TextMessage, message); err != nil {
+		if err := c.conn.WriteJSON(message); err != nil {
 			log.Println("Write error:", err)
 			return
 		}
