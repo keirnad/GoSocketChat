@@ -40,12 +40,13 @@ func (c *Client) Read(cr *ChatRoom) {
 	for {
 		err := c.conn.ReadJSON(&msg)
 		if err != nil {
-			log.Println("Error: ", err)
-		}
+			log.Print("Error:", err)
+        	break
+    	}
 		payload := Message{Nickname: msg.Nickname, Body: msg.Body}
 		jsonmsg, err := json.Marshal(payload)
 		if err != nil {
-			log.Print("Eror")
+			log.Print("Error:", err)
 		}
 		cr.broadcast <- []byte(jsonmsg)
 	}
