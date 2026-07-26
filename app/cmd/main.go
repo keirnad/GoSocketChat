@@ -1,8 +1,10 @@
 package main
 
 import (
+	"gochatroom/controllers"
 	"gochatroom/initializers"
 	"gochatroom/internal/server"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,10 +16,14 @@ func init() {
 }
 
 func main() {
-	chatRoom := server.NewChatRoom()
-	go chatRoom.Run()
-
 	r := gin.Default()
+	chatRoom := server.NewChatRoom()
+
+	r.POST("/signup", controllers.SignUp)
+	r.POST("/login", controllers.LogIn)
 	r.GET("/ws", chatRoom.HandleWebSocket)
-	r.Run(":8000")
+
+	r.Run(":" + os.Getenv("PORT"))
+
+	go chatRoom.Run()
 }
