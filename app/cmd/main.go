@@ -1,10 +1,15 @@
 package main
 
 import (
+	"gochatroom/initializers"
 	"gochatroom/internal/server"
 
 	"github.com/gin-gonic/gin"
 )
+
+func init() {
+	initializers.LoadVariables()
+}
 
 func main() {
 	chatRoom := server.NewChatRoom()
@@ -12,5 +17,5 @@ func main() {
 
 	r := gin.Default()
 	r.GET("/ws", chatRoom.HandleWebSocket)
-    r.Run(":8000")
+	r.Run(":8000")
 }
