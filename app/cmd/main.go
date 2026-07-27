@@ -23,7 +23,7 @@ func main() {
 	r.POST("/signup", controllers.SignUp)
 	r.POST("/login", controllers.LogIn)
 	r.GET("/validate", middleware.RequireAuth, controllers.Validate)
-	r.GET("/ws", chatRoom.HandleWebSocket)
+	r.GET("/ws", middleware.RequireAuth, chatRoom.HandleWebSocket)
 
 	r.Run(":" + os.Getenv("PORT"))
 
